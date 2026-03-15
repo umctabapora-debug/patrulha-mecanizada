@@ -1,0 +1,30 @@
+# ============================================================
+# Patrulha Mecanizada – SMAM Tabaporã/MT
+# Headers para PWA + Service Worker
+# ============================================================
+
+# Content-Type correto para Service Worker
+<Files "sw.js">
+    Header set Content-Type "application/javascript"
+    Header set Service-Worker-Allowed "/"
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+</Files>
+
+# Content-Type correto para manifest.json
+<Files "manifest.json">
+    Header set Content-Type "application/manifest+json"
+</Files>
+
+# HTTPS forçado
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Headers de segurança
+Header set X-Content-Type-Options "nosniff"
+Header set X-Frame-Options "SAMEORIGIN"
+
+# Cache para assets estáticos
+<FilesMatch "\.(html|js|json)$">
+    Header set Cache-Control "max-age=3600, must-revalidate"
+</FilesMatch>

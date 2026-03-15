@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#1a3c5e"/>
+<title>Patrulha Mecanizada – Tabaporã/MT</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Inter',sans-serif;background:#f0f4f8;min-height:100vh;}
+input,select,textarea,button{font-family:'Inter',sans-serif;}
+button{cursor:pointer;}
+.screen{display:none;}.screen.active{display:block;}
+
+/* TOPBAR */
+.topbar{background:#1a3c5e;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;font-size:12px;font-weight:600;}
+.topbar button{background:rgba(255,255,255,.15);border:none;color:#fff;padding:5px 11px;border-radius:6px;font-size:11px;}
+
+/* SELECTOR */
+.sel-wrap{min-height:100vh;background:linear-gradient(135deg,#1a3c5e,#0f5c2e);display:flex;align-items:center;justify-content:center;padding:20px;}
+.sel-card{background:#fff;border-radius:20px;padding:32px 24px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.app-logo{font-size:48px;}
+.app-title{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;letter-spacing:1px;color:#1a3c5e;margin-top:6px;}
+.app-sub{font-size:11px;color:#64748b;margin-top:3px;line-height:1.5;}
+.conn-badge{display:flex;align-items:center;gap:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 12px;margin:14px 0;font-size:12px;color:#166534;}
+.conn-badge button{margin-left:auto;background:none;border:none;color:#16a34a;font-size:11px;font-weight:600;}
+.mode-btns{display:flex;flex-direction:column;gap:10px;margin-top:10px;}
+.mode-btn{border:2px solid transparent;border-radius:14px;padding:15px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;width:100%;transition:all .2s;background:none;}
+.mode-btn.op{background:#eff6ff;border-color:#bfdbfe;}
+.mode-btn.off{background:#f0fdf4;border-color:#bbf7d0;}
+.mode-btn .mico{font-size:28px;flex-shrink:0;}
+.mode-btn-t{font-size:14px;font-weight:700;color:#1e293b;display:block;}
+.mode-btn-s{font-size:11px;color:#64748b;margin-top:2px;display:block;}
+
+/* FIELD */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:11px;}
+.field label{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.7px;}
+.field input,.field select,.field textarea{border:1.5px solid #e2e8f0;border-radius:9px;padding:11px 13px;font-size:14px;color:#1e293b;background:#fff;outline:none;width:100%;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#1a3c5e;box-shadow:0 0 0 3px rgba(26,60,94,.1);}
+.field input[readonly]{background:#f8fafc;color:#64748b;}
+.field select{cursor:pointer;}
+.field .hint{font-size:10px;color:#94a3b8;margin-top:2px;}
+
+/* BUTTONS */
+.btn{border:none;border-radius:10px;padding:12px 16px;font-size:13px;font-weight:700;transition:all .15s;cursor:pointer;}
+.btn:active{transform:scale(.97);}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:#1a3c5e;color:#fff;width:100%;}
+.btn-green{background:#0f5c2e;color:#fff;width:100%;}
+.btn-ghost{background:#f1f5f9;color:#475569;border:1.5px solid #e2e8f0;}
+.btn-danger{background:#dc2626;color:#fff;}
+.btn-warn{background:#f59e0b;color:#fff;}
+.btn-sm{padding:6px 11px;font-size:11px;border-radius:7px;}
+.btn-row{display:flex;gap:8px;}
+.btn-row .btn{flex:1;}
+
+/* OPERATOR */
+.m-wrap{max-width:480px;margin:0 auto;min-height:100vh;background:#f8fafc;}
+.m-hdr{background:linear-gradient(135deg,#1a3c5e,#0f5c2e);color:#fff;padding:12px 15px;display:flex;align-items:center;gap:10px;}
+.m-hico{font-size:24px;width:40px;height:40px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.m-htit{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:1px;}
+.m-hsub{font-size:10px;opacity:.75;margin-top:1px;}
+.m-prog{background:#fff;display:flex;align-items:center;padding:10px 13px;border-bottom:1px solid #e2e8f0;overflow-x:auto;gap:0;scrollbar-width:none;}
+.m-prog::-webkit-scrollbar{display:none;}
+.m-st{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.m-st-sep{color:#cbd5e1;margin:0 2px;font-size:12px;}
+.m-dot{width:22px;height:22px;border-radius:50%;background:#e2e8f0;color:#94a3b8;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.m-st.on .m-dot{background:#1a3c5e;color:#fff;}
+.m-st.dn .m-dot{background:#16a34a;color:#fff;}
+.m-lbl{font-size:10px;font-weight:600;color:#94a3b8;}
+.m-st.on .m-lbl{color:#1a3c5e;}
+.m-st.dn .m-lbl{color:#16a34a;}
+.m-body{padding:14px;}
+.m-sec{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:#1a3c5e;text-transform:uppercase;background:#e8f0fa;padding:6px 11px;border-radius:7px;margin-bottom:12px;}
+.m-err{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:9px 12px;border-radius:7px;margin-bottom:12px;font-size:12px;display:none;}
+.m-nav{display:flex;gap:9px;margin-top:16px;padding-bottom:26px;}
+.m-nav .btn{flex:1;}
+.calc-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.calc-row.three{grid-template-columns:1fr 1fr 1fr;}
+
+/* IMAGES */
+.img-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.img-grid.full{grid-template-columns:1fr;}
+.imgbox{border:2px dashed #cbd5e1;border-radius:10px;overflow:hidden;background:#fff;}
+.imgbox.ok{border:2px solid #16a34a;}
+.ib-hd{display:flex;align-items:center;gap:7px;padding:8px 11px;border-bottom:1px solid #f1f5f9;}
+.tick{font-size:13px;}.tick.y{color:#16a34a;font-weight:700;}.tick.n{color:#94a3b8;}
+.ib-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#334155;flex:1;line-height:1.3;}
+.ib-rm{background:#fee2e2;border:none;color:#dc2626;width:22px;height:22px;border-radius:50%;font-size:10px;flex-shrink:0;}
+.ib-drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:18px 10px;cursor:pointer;}
+.ib-drop:active{background:#f0f9ff;}
+.ib-prev{position:relative;overflow:hidden;background:#000;cursor:pointer;}
+.ib-prev.portrait{height:100px;}
+.ib-prev.landscape{height:80px;}
+.ib-prev img{width:100%;height:100%;display:block;}
+.ib-prev.portrait img{object-fit:contain;background:#fff;}
+.ib-prev.landscape img{object-fit:cover;}
+.ib-ov{position:absolute;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;opacity:0;}
+.ib-prev:hover .ib-ov,.ib-prev:active .ib-ov{opacity:1;}
+
+/* SUCCESS */
+.m-ok{text-align:center;padding:45px 20px;display:flex;flex-direction:column;align-items:center;gap:7px;}
+.m-ok h2{font-size:19px;font-weight:700;color:#166534;}
+
+/* OFFICE */
+.o-wrap{min-height:100vh;background:#f0f4f8;}
+.o-hdr{background:linear-gradient(135deg,#1a3c5e,#0f5c2e);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.o-htit{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;letter-spacing:1px;}
+.o-hsub{font-size:10px;opacity:.7;margin-top:1px;}
+.o-hbtns{display:flex;gap:7px;flex-wrap:wrap;}
+.o-hbtn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 11px;border-radius:7px;font-size:11px;font-weight:600;}
+
+/* TABS */
+.tab-bar{display:flex;background:#fff;border-bottom:2px solid #e2e8f0;overflow-x:auto;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-it{flex:0 0 auto;padding:11px 14px;font-size:12px;font-weight:600;color:#94a3b8;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;}
+.tab-it.on{color:#1a3c5e;border-bottom-color:#1a3c5e;}
+.tab-pane{display:none;padding:14px;}.tab-pane.on{display:block;}
+
+/* KPIS */
+.kpi-row{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:12px;}
+@media(min-width:480px){.kpi-row{grid-template-columns:repeat(4,1fr);}}
+.kpi{background:#fff;border-radius:11px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.kpi-val{font-size:20px;font-weight:800;color:#1a3c5e;font-family:'Barlow Condensed',sans-serif;}
+.kpi-lbl{font-size:9px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:1px;}
+
+/* CARDS */
+.card-list{display:flex;flex-direction:column;gap:9px;}
+.os-card{background:#fff;border-radius:12px;box-shadow:0 2px 9px rgba(0,0,0,.07);overflow:hidden;border:2px solid transparent;}
+.os-card:hover{border-color:#bfdbfe;}
+.os-top{padding:11px 13px;display:flex;align-items:flex-start;gap:10px;}
+.os-badge{background:#e0f2fe;color:#0369a1;padding:3px 8px;border-radius:6px;font-weight:700;font-size:12px;white-space:nowrap;}
+.os-main{flex:1;min-width:0;}
+.os-name{font-size:13px;font-weight:700;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.os-meta{font-size:11px;color:#64748b;margin-top:1px;}
+.os-bot{padding:7px 13px 9px;display:flex;align-items:center;gap:7px;border-top:1px solid #f1f5f9;flex-wrap:wrap;}
+.tag{padding:2px 7px;border-radius:5px;font-size:10px;font-weight:600;white-space:nowrap;}
+.tag-serv{background:#f0fdf4;color:#166534;}
+.tag-val{background:#fef3c7;color:#92400e;}
+.tag-foto{background:#dcfce7;color:#166534;}
+.tag-foto-p{background:#fef9c3;color:#854d0e;}
+.tag-foto-n{background:#fee2e2;color:#991b1b;}
+.os-btns{margin-left:auto;display:flex;gap:5px;}
+.ic-btn{border:none;border-radius:6px;padding:5px 8px;font-size:12px;}
+.ic-btn.edit{background:#eff6ff;color:#1d4ed8;}
+.ic-btn.del{background:#fee2e2;color:#dc2626;}
+.ic-btn.prnt{background:#f0fdf4;color:#166534;}
+
+/* CADASTRO */
+.cad-section{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:12px;overflow:hidden;}
+.cad-hd{background:#1a3c5e;color:#fff;padding:10px 14px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;display:flex;align-items:center;justify-content:space-between;}
+.cad-body{padding:13px 14px;}
+.item-list{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+.item-row{display:flex;align-items:center;gap:7px;background:#f8fafc;border-radius:7px;padding:7px 11px;}
+.item-row span{flex:1;font-size:12px;color:#1e293b;line-height:1.4;}
+.item-rm{background:#fee2e2;border:none;color:#dc2626;width:24px;height:24px;border-radius:5px;font-size:11px;flex-shrink:0;}
+.item-edit{background:#eff6ff;border:none;color:#1d4ed8;width:24px;height:24px;border-radius:5px;font-size:11px;flex-shrink:0;}
+.add-row{display:flex;gap:7px;}
+.add-row input,.add-row select{flex:1;border:1.5px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-size:12px;outline:none;}
+.add-row input:focus{border-color:#1a3c5e;}
+.add-row button{background:#1a3c5e;color:#fff;border:none;border-radius:7px;padding:8px 13px;font-size:12px;font-weight:700;white-space:nowrap;}
+.val-row{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;}
+
+/* PRODUTOR CARD */
+.prod-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:8px;overflow:hidden;}
+.prod-top{padding:10px 13px;display:flex;align-items:center;gap:9px;}
+.prod-ico{font-size:20px;background:#eff6ff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.prod-main{flex:1;min-width:0;}
+.prod-name{font-size:13px;font-weight:700;color:#1e293b;}
+.prod-meta{font-size:11px;color:#64748b;margin-top:1px;}
+.prod-btns{display:flex;gap:5px;}
+.prod-imoveis{padding:0 13px 10px;display:flex;flex-direction:column;gap:4px;}
+.imovel-row{display:flex;align-items:center;gap:7px;background:#f8fafc;border-radius:6px;padding:6px 10px;}
+.imovel-row span{flex:1;font-size:11px;color:#475569;line-height:1.4;}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;padding:16px;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:#fff;border-radius:16px;padding:24px 20px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto;}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:14px;color:#1a3c5e;}
+.modal-btns{display:flex;gap:9px;margin-top:16px;}
+
+/* PRINT */
+.print-bar{display:flex;align-items:center;padding:9px 16px;background:#fff;border-bottom:1px solid #e2e8f0;gap:9px;}
+.print-bar button{border:none;border-radius:7px;padding:7px 13px;font-size:12px;font-weight:700;}
+.pt-back{background:#f1f5f9;color:#475569;}
+.pt-print{background:#0f5c2e;color:#fff;}
+.pt-lbl{flex:1;font-size:11px;font-weight:600;color:#1a3c5e;text-align:center;}
+.pd{padding:14px 16px;font-family:Arial,sans-serif;font-size:10px;max-width:210mm;margin:0 auto;background:#fff;}
+.pd-center{text-align:center;margin-bottom:8px;}
+.pd-title{font-size:12px;font-weight:bold;text-transform:uppercase;border:2px solid #000;padding:5px 10px;display:inline-block;letter-spacing:1px;}
+.pd-sub{font-size:8px;margin-top:3px;font-weight:bold;color:#333;text-transform:uppercase;}
+.pd-muni{font-size:7px;color:#555;margin-top:2px;}
+table.ptb{width:100%;border-collapse:collapse;margin-bottom:7px;}
+table.ptb td{border:1px solid #333;padding:4px 6px;vertical-align:top;font-size:10px;}
+.pt-hd{font-weight:bold;font-size:9px;background:#d9d9d9;text-transform:uppercase;}
+.pt-lbl2{font-weight:bold;font-size:9px;white-space:nowrap;}
+.pt-chk{text-align:center;font-weight:bold;font-size:9px;}
+.pt-ic{padding:3px!important;vertical-align:top;}
+.pt-ic img{width:100%;display:block;background:#fff;}
+.pt-ic img.port{height:160px;object-fit:contain;}
+.pt-ic img.land{height:110px;object-fit:cover;}
+.pt-noimg{border:1px dashed #aaa;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:8px;color:#bbb;text-transform:uppercase;font-weight:bold;}
+.pt-noimg.port{height:160px;}
+.pt-noimg.land{height:110px;}
+.pd-footer{text-align:right;font-size:7px;color:#888;margin-top:5px;}
+
+/* PASSWORD */
+.pwd-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.pwd-ov.open{display:flex;}
+.pwd-card{background:#fff;border-radius:16px;padding:28px 22px;max-width:300px;width:100%;text-align:center;}
+.pwd-inp{width:100%;border:2px solid #e2e8f0;border-radius:9px;padding:12px;font-size:22px;letter-spacing:8px;text-align:center;outline:none;font-weight:700;}
+.pwd-inp:focus{border-color:#1a3c5e;}
+.pwd-err{color:#dc2626;font-size:11px;font-weight:600;margin-top:7px;min-height:16px;}
+
+/* LOADING */
+.ldg{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:12px;color:#94a3b8;}
+.spin{font-size:32px;animation:spin 1.2s linear infinite;}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+.search-inp{width:100%;border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 13px;font-size:13px;background:#fff;outline:none;margin-bottom:12px;}
+.search-inp:focus{border-color:#1a3c5e;}
+.empty{text-align:center;padding:40px 20px;color:#94a3b8;font-size:13px;}
+
+@media print{
+  @page{size:A4 portrait;margin:8mm 10mm;}
+  body>*{visibility:hidden;}
+  .pd,.pd *{visibility:visible!important;}
+  .pd{position:fixed;top:0;left:0;width:100%;padding:0;}
+  .print-bar,.topbar,.mode-bar{display:none!important;}
+}
+</style>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#1a3c5e"/>
+</head>
+<body>
+
+<!-- SELECTOR -->
+<div id="screen-selector" class="screen active">
+<div class="sel-wrap"><div class="sel-card">
+  <div class="app-logo">🚜</div>
+  <div class="app-title">PATRULHA MECANIZADA</div>
+  <div class="app-sub">Secretaria Municipal de Agricultura e Meio Ambiente<br/>Prefeitura de Tabaporã – MT</div>
+  <div class="conn-badge">✅ Sistema conectado ao Google Drive</div>
+  <div class="mode-btns">
+    <button class="mode-btn op" onclick="goOp()">
+      <span class="mico">📱</span>
+      <div><span class="mode-btn-t">Operador</span><span class="mode-btn-s">Lançar serviço executado pela Patrulha</span></div>
+    </button>
+    <button class="mode-btn off" onclick="goOff()">
+      <span class="mico">🖥️</span>
+      <div><span class="mode-btn-t">Escritório</span><span class="mode-btn-s">Relatórios, cadastros e impressão</span></div>
+    </button>
+  </div>
+</div></div>
+</div>
+
+<!-- OPERATOR -->
+<div id="screen-operator" class="screen">
+<div class="topbar"><span>🚜 Patrulha Mecanizada · Operador</span><button onclick="goHome()">⬅ Início</button></div>
+<div class="m-wrap">
+  <div class="m-hdr">
+    <div class="m-hico">🚜</div>
+    <div><div class="m-htit">LANÇAMENTO DE SERVIÇO</div><div class="m-hsub">Preencha todos os campos obrigatórios</div></div>
+  </div>
+  <div class="m-prog" id="op-prog">
+    <div class="m-st on" id="ops0"><div class="m-dot">1</div><div class="m-lbl">Produtor</div></div>
+    <div class="m-st-sep">›</div>
+    <div class="m-st" id="ops1"><div class="m-dot">2</div><div class="m-lbl">OS</div></div>
+    <div class="m-st-sep">›</div>
+    <div class="m-st" id="ops2"><div class="m-dot">3</div><div class="m-lbl">Máquina</div></div>
+    <div class="m-st-sep">›</div>
+    <div class="m-st" id="ops3"><div class="m-dot">4</div><div class="m-lbl">Fotos</div></div>
+  </div>
+  <div class="m-body" id="op-body"></div>
+</div>
+</div>
+
+<!-- OFFICE -->
+<div id="screen-office" class="screen">
+<div class="topbar"><span>🖥️ Escritório · Patrulha Mecanizada</span><button onclick="goHome()">⬅ Início</button></div>
+<div class="o-wrap">
+  <div class="o-hdr">
+    <div><div class="o-htit">ESCRITÓRIO – PATRULHA MECANIZADA</div><div class="o-hsub">SMAM · Tabaporã/MT</div></div>
+    <div class="o-hbtns">
+      <button class="o-hbtn" onclick="loadRecs()">↻ Atualizar</button>
+      <button class="o-hbtn" id="sheet-btn" style="display:none" onclick="window.open(sheetUrl,'_blank')">📊 Planilha</button>
+      <button class="o-hbtn" onclick="printAll()">🖨️ Imprimir Todos</button>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-it on" onclick="swOffTab(0)">📋 Serviços</button>
+    <button class="tab-it" onclick="swOffTab(1)">👥 Produtores</button>
+    <button class="tab-it" onclick="swOffTab(2)">⚙️ Cadastros</button>
+    <button class="tab-it" onclick="swOffTab(3)">💰 Valores</button>
+  </div>
+
+  <!-- TAB 0: SERVIÇOS -->
+  <div id="oft0" class="tab-pane on">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-val" id="kpi-t">—</div><div class="kpi-lbl">Atendimentos</div></div>
+      <div class="kpi"><div class="kpi-val" id="kpi-a">—</div><div class="kpi-lbl">Hectares Total</div></div>
+      <div class="kpi"><div class="kpi-val" id="kpi-h">—</div><div class="kpi-lbl">Horas Total</div></div>
+      <div class="kpi"><div class="kpi-val" id="kpi-v">—</div><div class="kpi-lbl">Valor Total</div></div>
+    </div>
+    <input class="search-inp" id="o-search" placeholder="🔍 Buscar produtor, operador, OS..." oninput="filterRecs()"/>
+    <div id="o-list"></div>
+  </div>
+
+  <!-- TAB 1: PRODUTORES -->
+  <div id="oft1" class="tab-pane">
+    <button class="btn btn-primary" style="margin-bottom:12px" onclick="openProdModal()">+ Cadastrar Produtor</button>
+    <input class="search-inp" id="prod-search" placeholder="🔍 Buscar produtor..." oninput="filterProd()"/>
+    <div id="prod-list"></div>
+  </div>
+
+  <!-- TAB 2: CADASTROS -->
+  <div id="oft2" class="tab-pane">
+    <!-- Maquinários -->
+    <div class="cad-section">
+      <div class="cad-hd">🚜 MAQUINÁRIOS <span style="font-weight:400;font-size:11px;opacity:.7" id="maq-count"></span></div>
+      <div class="cad-body">
+        <div class="item-list" id="maq-list"></div>
+        <div class="add-row">
+          <input id="maq-inp" placeholder="Ex: TRATOR CASE 110A" onkeydown="if(event.key==='Enter')addItem('maq')"/>
+          <button onclick="addItem('maq')">+ Adicionar</button>
+        </div>
+      </div>
+    </div>
+    <!-- Implementos -->
+    <div class="cad-section">
+      <div class="cad-hd">🔧 IMPLEMENTOS <span style="font-weight:400;font-size:11px;opacity:.7" id="imp-count"></span></div>
+      <div class="cad-body">
+        <div class="item-list" id="imp-list"></div>
+        <div class="add-row">
+          <input id="imp-inp" placeholder="Ex: GRADE ARADORA" onkeydown="if(event.key==='Enter')addItem('imp')"/>
+          <button onclick="addItem('imp')">+ Adicionar</button>
+        </div>
+      </div>
+    </div>
+    <!-- Operadores -->
+    <div class="cad-section">
+      <div class="cad-hd">👷 OPERADORES <span style="font-weight:400;font-size:11px;opacity:.7" id="op-count"></span></div>
+      <div class="cad-body">
+        <div class="item-list" id="op-list"></div>
+        <div class="add-row">
+          <input id="op-inp" placeholder="Ex: JOAO PAULO MARTINS DA COSTA" onkeydown="if(event.key==='Enter')addItem('op')"/>
+          <button onclick="addItem('op')">+ Adicionar</button>
+        </div>
+      </div>
+    </div>
+    <!-- Tipos de Serviço -->
+    <div class="cad-section">
+      <div class="cad-hd">📋 TIPOS DE SERVIÇO <span style="font-weight:400;font-size:11px;opacity:.7" id="ts-count"></span></div>
+      <div class="cad-body">
+        <div class="item-list" id="ts-list"></div>
+        <div class="add-row">
+          <input id="ts-inp" placeholder="Ex: GRADEAÇÃO" onkeydown="if(event.key==='Enter')addItem('ts')"/>
+          <button onclick="addItem('ts')">+ Adicionar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: VALORES -->
+  <div id="oft3" class="tab-pane">
+    <div class="cad-section">
+      <div class="cad-hd">💰 TABELA DE VALORES – HORA MÁQUINA</div>
+      <div class="cad-body">
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 13px;font-size:11px;color:#1e40af;margin-bottom:12px;">
+          📅 Data de atualização: <strong id="val-data-atu"></strong>
+          <button onclick="updDataAtu()" style="margin-left:8px;background:none;border:none;color:#1d4ed8;font-size:11px;font-weight:600;cursor:pointer">✏️ Alterar</button>
+        </div>
+        <div class="item-list" id="val-list"></div>
+        <div class="add-row" style="flex-wrap:wrap;gap:6px;">
+          <input id="val-maq-inp" placeholder="Tipo de máquina" style="flex:2;min-width:120px"/>
+          <input id="val-preco-inp" placeholder="R$ valor" type="number" step="0.01" style="flex:1;min-width:80px"/>
+          <select id="val-tipo-inp" style="flex:1;min-width:90px;border:1.5px solid #e2e8f0;border-radius:7px;padding:8px;font-size:12px;outline:none;">
+            <option value="hora">/ hora</option>
+            <option value="diaria">/ diária</option>
+          </select>
+          <button onclick="addValor()">+ Adicionar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PRINT -->
+<div id="screen-print" class="screen">
+<div class="print-bar">
+  <button class="pt-back" onclick="closePrint()">← Voltar</button>
+  <div class="pt-lbl" id="pt-lbl"></div>
+  <button class="pt-print" onclick="window.print()">🖨️ Imprimir</button>
+</div>
+<div class="pd" id="print-doc"></div>
+</div>
+
+<!-- MODAIS -->
+<!-- Produtor Modal -->
+<div class="modal-bg" id="prod-modal">
+<div class="modal">
+  <h3 id="prod-modal-title">👤 Cadastrar Produtor</h3>
+  <div class="field"><label>CPF do Produtor *</label><input id="pm-cpf" type="text" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"/></div>
+  <div class="field"><label>Nome Completo *</label><input id="pm-nome" type="text" placeholder="Nome completo"/></div>
+  <div class="field"><label>WhatsApp</label><input id="pm-wa" type="tel" placeholder="(66) 99999-9999" maxlength="15" oninput="maskFone(this)"/></div>
+  <div style="margin-bottom:8px">
+    <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">IMÓVEIS</div>
+    <div id="pm-imoveis-list" style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px"></div>
+    <div style="display:flex;gap:6px;margin-bottom:6px">
+      <input id="pm-im-nome" placeholder="Nome do imóvel" style="flex:1;border:1.5px solid #e2e8f0;border-radius:7px;padding:7px 10px;font-size:12px;outline:none"/>
+      <input id="pm-im-end" placeholder="Endereço/localização" style="flex:1;border:1.5px solid #e2e8f0;border-radius:7px;padding:7px 10px;font-size:12px;outline:none"/>
+      <button onclick="addImovel()" style="background:#1a3c5e;color:#fff;border:none;border-radius:7px;padding:7px 11px;font-size:12px;font-weight:700">+</button>
+    </div>
+  </div>
+  <div class="modal-btns">
+    <button class="btn btn-ghost" onclick="closeProdModal()">Cancelar</button>
+    <button class="btn btn-primary" onclick="saveProd()">💾 Salvar</button>
+  </div>
+</div>
+</div>
+
+<!-- Edit OS Modal -->
+<div class="modal-bg" id="edit-modal">
+<div class="modal">
+  <h3>✏️ Editar Lançamento</h3>
+  <div id="edit-form"></div>
+  <div class="modal-btns">
+    <button class="btn btn-ghost" onclick="closeEditModal()">Cancelar</button>
+    <button class="btn btn-primary" onclick="saveEdit()">💾 Salvar Alterações</button>
+  </div>
+</div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal-bg" id="del-modal">
+<div class="modal" style="text-align:center">
+  <div style="font-size:36px">⚠️</div>
+  <h3 style="margin-top:8px">Confirmar exclusão</h3>
+  <p style="font-size:13px;color:#64748b">Excluir este registro permanentemente?</p>
+  <div class="modal-btns" style="justify-content:center">
+    <button class="btn btn-ghost" onclick="closeDel()">Cancelar</button>
+    <button class="btn btn-danger" onclick="doDel()">Excluir</button>
+  </div>
+</div>
+</div>
+
+<!-- Password -->
+<div class="pwd-ov" id="pwd-ov">
+<div class="pwd-card">
+  <div style="font-size:40px">🔐</div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:#1a3c5e;margin:6px 0 4px">ACESSO RESTRITO</div>
+  <div style="font-size:11px;color:#64748b;margin-bottom:14px">Escritório – Patrulha Mecanizada</div>
+  <input class="pwd-inp" id="pwd-inp" type="password" maxlength="6" placeholder="••••••" onkeydown="if(event.key==='Enter')chkPwd()"/>
+  <div class="pwd-err" id="pwd-err"></div>
+  <button class="btn btn-primary" style="margin-top:12px" onclick="chkPwd()">🔓 Entrar</button>
+  <button class="btn btn-ghost" style="margin-top:7px;width:100%" onclick="closePwd()">Cancelar</button>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// CONFIG FIXO
+// ═══════════════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwrOTKgO8K54vuSAaFKt6rZM4kQFT7pTuiMC4cxAlUruCMX_KFZOFKEvKV8VZVuTHqZ/exec';
+const PWD = '142536';
+
+// ═══════════════════════════════════════
+// LISTAS (localStorage)
+// ═══════════════════════════════════════
+const DEF = {
+  maq:  ['23 – TRATOR CASE 100A','24 – TRATOR NEW HOLLAND','25 – TRATOR JOHN DEERE','26 – PATROL','27 – RETROESCAVADEIRA','OUTRO'],
+  imp:  ['GRADE ARADORA','GRADE NIVELADORA','ARADO DE DISCO','SUBSOLADOR','PLANTADEIRA','CALCAREADEIRA','ROÇADEIRA','OUTRO'],
+  op:   ['JOAO PAULO MARTINS DA COSTA'],
+  ts:   ['GRADEAÇÃO','ARAÇÃO','SUBSOLAGEM','NIVELAMENTO','PLANTIO','CALAGEM','ROÇAGEM MECANIZADA','ABERTURA DE ESTRADA','TERRAPLANAGEM','OUTRO'],
+  prod: [],
+  val:  [
+    {maq:'TRATOR',preco:135.51,tipo:'hora'},
+    {maq:'PÁ CARREGADEIRA',preco:180.68,tipo:'hora'},
+    {maq:'ESCAVADEIRA',preco:406.53,tipo:'hora'},
+    {maq:'PATROLA',preco:406.53,tipo:'hora'},
+    {maq:'CAÇAMBA',preco:767.89,tipo:'diaria'}
+  ],
+  valData:'30/06/2025'
+};
+
+function gl(k){try{const v=localStorage.getItem('pm2_'+k);return v?JSON.parse(v):DEF[k]||[];}catch{return DEF[k]||[];}}
+function sl(k,v){try{localStorage.setItem('pm2_'+k,JSON.stringify(v));}catch{}}
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let allRecs=[], pendingDel=null, sheetUrl='', editRec=null;
+let editProdIdx=null, pmImoveis=[];
+let opStep=0, opForm={}, opImgs={};
+
+function el(id){return document.getElementById(id);}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));el('screen-'+id).classList.add('active');}
+function today(){return new Date().toISOString().split('T')[0];}
+function fmt(s){
+  if(!s)return'—';
+  try{
+    // Handle ISO timestamp like "14T04:00:00.000Z/03/2026" or "2026-03-14T04:00:00.000Z"
+    const clean = String(s).split('T')[0];  // get just the date part
+    if(clean.includes('-')){
+      const[y,m,d]=clean.split('-');
+      if(y&&m&&d) return d.padStart(2,'0')+'/'+m.padStart(2,'0')+'/'+y;
+    }
+  }catch(e){}
+  return String(s);
+}
+function fmtR(n){if(!n&&n!==0)return'—';return'R$ '+Number(n).toLocaleString('pt-BR',{minimumFractionDigits:2});}
+function goHome(){showScreen('selector');}
+
+// ═══════════════════════════════════════
+// GAS API
+// ═══════════════════════════════════════
+async function gas(action,extra={}){
+  const r=await fetch(GAS_URL,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action,...extra})});
+  const j=await r.json();
+  if(!j.ok)throw new Error(j.error||'Erro');
+  return j.data;
+}
+
+// ═══════════════════════════════════════
+// PASSWORD
+// ═══════════════════════════════════════
+function goOff(){el('pwd-inp').value='';el('pwd-err').textContent='';el('pwd-ov').classList.add('open');setTimeout(()=>el('pwd-inp').focus(),100);}
+function closePwd(){el('pwd-ov').classList.remove('open');}
+function chkPwd(){
+  if(el('pwd-inp').value===PWD){closePwd();loadRecs();showScreen('office');renderCads();renderProdList();renderVals();}
+  else{el('pwd-err').textContent='Senha incorreta.';el('pwd-inp').value='';el('pwd-inp').focus();}
+}
+
+// ═══════════════════════════════════════
+// MASKS
+// ═══════════════════════════════════════
+function maskCPF(inp){
+  let v=inp.value.replace(/\D/g,'').substring(0,11);
+  if(v.length>9)v=v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'$1.$2.$3-$4');
+  else if(v.length>6)v=v.replace(/(\d{3})(\d{3})(\d{1,3})/,'$1.$2.$3');
+  else if(v.length>3)v=v.replace(/(\d{3})(\d{1,3})/,'$1.$2');
+  inp.value=v;
+}
+function maskFone(inp){
+  let v=inp.value.replace(/\D/g,'').substring(0,11);
+  if(v.length>10)v=v.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
+  else if(v.length>6)v=v.replace(/(\d{2})(\d{4,5})(\d{0,4})/,'($1) $2-$3');
+  else if(v.length>2)v=v.replace(/(\d{2})(\d+)/,'($1) $2');
+  inp.value=v;
+}
+
+// ═══════════════════════════════════════
+// COMPRESS
+// ═══════════════════════════════════════
+function compress(url,mW=800,q=0.70){
+  return new Promise(res=>{
+    const i=new Image();i.onload=()=>{
+      const sc=Math.min(1,mW/i.width);
+      const c=document.createElement('canvas');c.width=Math.round(i.width*sc);c.height=Math.round(i.height*sc);
+      c.getContext('2d').drawImage(i,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',q));
+    };i.onerror=()=>res(url);i.src=url;
+  });
+}
+async function compressAll(imgs){
+  const o={};for(const k of Object.keys(imgs))o[k]=imgs[k]?await compress(imgs[k]):null;return o;
+}
+
+// ═══════════════════════════════════════
+// OPERATOR FORM
+// ═══════════════════════════════════════
+function goOp(){
+  opStep=0;
+  opForm={cpfProdutor:'',nomeProdutor:'',whatsapp:'',imovel:'',
+    dataOS:today(),nOrdem:'',horIni:'',horFin:'',totalHoras:'',valorHora:'',valorTotal:'',tipoServico:'',hectares:'',
+    maquinario:'',implemento:'',operador:''};
+  opImgs={requerimento:null,ordemServico:null,areaAntes:null,areaDepois:null,areaDemarcacao:null};
+  showScreen('operator');renderStep();
+}
+
+function mkSel(id,lista,val,placeholder){
+  const s=document.createElement('select');s.id=id;
+  const d=document.createElement('option');d.value='';d.textContent=placeholder||'Selecionar...';s.appendChild(d);
+  lista.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;if(v===val)o.selected=true;s.appendChild(o);});
+  return s;
+}
+function mkInp(id,type,val,placeholder,im,attrs){
+  const i=document.createElement('input');i.id=id;i.type=type||'text';i.value=val||'';
+  if(placeholder)i.placeholder=placeholder;if(im)i.inputMode=im;
+  if(attrs)Object.assign(i,attrs);return i;
+}
+function mkFld(label,el_,hint){
+  const w=document.createElement('div');w.className='field';
+  const l=document.createElement('label');l.textContent=label;w.appendChild(l);w.appendChild(el_);
+  if(hint){const h=document.createElement('div');h.className='hint';h.textContent=hint;w.appendChild(h);}
+  return w;
+}
+
+function renderStep(){
+  for(let i=0;i<4;i++){
+    const s=el('ops'+i);s.classList.remove('on','dn');
+    if(i<opStep)s.classList.add('dn');else if(i===opStep)s.classList.add('on');
+    s.querySelector('.m-dot').textContent=i<opStep?'✔':(i+1);
+  }
+  const body=el('op-body');body.innerHTML='';
+  if(opStep===4){body.innerHTML=`<div class="m-ok"><div style="font-size:60px">✅</div><h2>Serviço Enviado!</h2><p style="color:#475569;font-size:13px;margin-top:4px">OS Nº <strong>${opForm.nOrdem}</strong> salva com sucesso.</p><button class="btn btn-primary" style="margin-top:16px;max-width:240px" onclick="goOp()">➕ Novo Serviço</button></div>`;return;}
+
+  const sec=document.createElement('div');sec.className='m-sec';
+  const err=document.createElement('div');err.className='m-err';err.id='op-err';
+
+  if(opStep===0){
+    sec.textContent='1. Identificação do Produtor';body.appendChild(sec);
+    // CPF com busca
+    const cpfInp=mkInp('f-cpf','text',opForm.cpfProdutor,'000.000.000-00','numeric');
+    cpfInp.maxLength=14;cpfInp.oninput=function(){maskCPF(this);buscaProdCPF(this.value);};
+    body.appendChild(mkFld('CPF do Produtor *',cpfInp));
+    body.appendChild(mkFld('Nome do Produtor *',mkInp('f-nome','text',opForm.nomeProdutor,'Nome completo')));
+    body.appendChild(mkFld('WhatsApp',mkInp('f-wa','tel',opForm.whatsapp,'(66) 99999-9999','tel',{maxLength:15,oninput:function(){maskFone(this);}})));
+    const imoveis=getProdImoveis(opForm.cpfProdutor);
+    const imSel=mkSel('f-imovel',imoveis.map(x=>x.nome+' – '+x.end),opForm.imovel,'Selecionar imóvel...');
+    const imWrap=document.createElement('div');imWrap.style.cssText='display:flex;gap:6px;align-items:center;';
+    imWrap.appendChild(imSel);
+    const rfBtn=document.createElement('button');rfBtn.type='button';rfBtn.textContent='🔄';
+    rfBtn.style.cssText='background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:8px;padding:10px;font-size:16px;flex-shrink:0;cursor:pointer;';
+    rfBtn.title='Atualizar imóveis';
+    rfBtn.onclick=()=>{
+      const cpf=el('f-cpf')?.value||opForm.cpfProdutor;
+      const novosImoveis=getProdImoveis(cpf);
+      imSel.innerHTML='<option value="">Selecionar imóvel...</option>';
+      novosImoveis.forEach(x=>{const o=document.createElement('option');o.value=x.nome+' – '+x.end;o.textContent=x.nome+' – '+x.end;imSel.appendChild(o);});
+      rfBtn.textContent='✅';setTimeout(()=>rfBtn.textContent='🔄',1500);
+    };
+    imWrap.appendChild(rfBtn);
+    const imFld=document.createElement('div');imFld.className='field';
+    const imLbl=document.createElement('label');imLbl.textContent='Identificação do Imóvel';
+    const imHint=document.createElement('div');imHint.className='hint';imHint.textContent='Toque em 🔄 se os imóveis não aparecerem';
+    imFld.appendChild(imLbl);imFld.appendChild(imWrap);imFld.appendChild(imHint);
+    body.appendChild(imFld);
+  } else if(opStep===1){
+    sec.textContent='2. Dados da Ordem de Serviço';body.appendChild(sec);
+    body.appendChild(mkFld('Data *',mkInp('f-data','date',opForm.dataOS)));
+    body.appendChild(mkFld('Nº Ordem de Serviço *',mkInp('f-nos','text',opForm.nOrdem,'Ex: 001','numeric')));
+    const cr=document.createElement('div');cr.className='calc-row';
+    const hIni=mkInp('f-hini','number',opForm.horIni,'0.0','decimal',{step:'0.1',oninput:calcHoras});
+    const hFin=mkInp('f-hfin','number',opForm.horFin,'0.0','decimal',{step:'0.1',oninput:calcHoras});
+    cr.appendChild(mkFld('Horímetro Inicial',hIni));cr.appendChild(mkFld('Horímetro Final',hFin));body.appendChild(cr);
+    const cr2=document.createElement('div');cr2.className='calc-row three';
+    const htot=mkInp('f-htot','text',opForm.totalHoras,'0.0');htot.readOnly=true;
+    const vhInp=mkInp('f-vh','number',opForm.valorHora,'0.00','decimal',{step:'0.01',oninput:calcValor});
+    const vtInp=mkInp('f-vt','text',opForm.valorTotal,'0.00');vtInp.readOnly=true;
+    cr2.appendChild(mkFld('Total Horas',htot,'automático'));cr2.appendChild(mkFld('Valor Hora (R$)',vhInp));cr2.appendChild(mkFld('Valor Total',vtInp,'automático'));body.appendChild(cr2);
+
+    // Sugestão de valor
+    const sug=document.createElement('div');sug.id='val-sug';sug.style.cssText='margin-bottom:10px;font-size:11px;color:#1d4ed8;';
+    sug.innerHTML='💡 Valores da tabela: '+gl('val').map(v=>`<a href="#" onclick="setVH(${v.preco});return false" style="margin-right:8px;color:#1d4ed8;">${v.maq}: R$ ${v.preco.toFixed(2)}/${v.tipo}</a>`).join('');
+    body.appendChild(sug);
+
+    body.appendChild(mkFld('Tipo de Serviço *',mkSel('f-ts',gl('ts'),opForm.tipoServico,'Selecionar...')));
+    body.appendChild(mkFld('Hectares Executados *',mkInp('f-ha','number',opForm.hectares,'Ex: 1.5','decimal',{step:'0.1'})));
+  } else if(opStep===2){
+    sec.textContent='3. Dados do Operador / Maquinário';body.appendChild(sec);
+    body.appendChild(mkFld('Maquinário *',mkSel('f-maq',gl('maq'),opForm.maquinario,'Selecionar...')));
+    body.appendChild(mkFld('Implemento',mkSel('f-imp',gl('imp'),opForm.implemento,'Selecionar...')));
+    body.appendChild(mkFld('Operador *',mkSel('f-opr',gl('op'),opForm.operador,'Selecionar...')));
+  } else if(opStep===3){
+    sec.textContent='4. Fotos e Anexos';body.appendChild(sec);
+    const ic=Object.values(opImgs).filter(Boolean).length;
+    const ctr=document.createElement('div');ctr.style.cssText='font-size:12px;color:#475569;margin-bottom:10px;';
+    ctr.innerHTML=`<b id="img-ctr" style="font-size:16px;color:${ic===5?'#16a34a':'#f59e0b'}">${ic}/5</b> imagens anexadas`;
+    body.appendChild(ctr);
+    // 2 retratos
+    const g1=document.createElement('div');g1.className='img-grid';
+    g1.appendChild(buildIB('requerimento','REQUERIMENTO','portrait'));
+    g1.appendChild(buildIB('ordemServico','ORDEM DE SERVIÇO','portrait'));
+    body.appendChild(g1);
+    // 3 paisagens
+    const g2=document.createElement('div');g2.className='img-grid full';
+    g2.appendChild(buildIB('areaAntes','ÁREA ANTES','landscape'));
+    g2.appendChild(buildIB('areaDepois','ÁREA DEPOIS','landscape'));
+    g2.appendChild(buildIB('areaDemarcacao','ÁREA DEMARCADA','landscape'));
+    body.appendChild(g2);
+  }
+
+  body.appendChild(err);
+  const nav=document.createElement('div');nav.className='m-nav';
+  if(opStep>0){const b=document.createElement('button');b.className='btn btn-ghost';b.textContent='← Voltar';b.onclick=opBack;nav.appendChild(b);}
+  if(opStep<3){const b=document.createElement('button');b.className='btn btn-primary';b.textContent='Próximo →';b.onclick=opNext;nav.appendChild(b);}
+  if(opStep===3){const b=document.createElement('button');b.className='btn btn-green';b.id='send-btn';b.textContent='📤 Enviar Serviço';b.onclick=opSend;nav.appendChild(b);}
+  body.appendChild(nav);
+}
+
+function calcHoras(){
+  const ini=parseFloat(el('f-hini')?.value||0);
+  const fin=parseFloat(el('f-hfin')?.value||0);
+  const tot=fin>ini?(fin-ini).toFixed(1):'0.0';
+  if(el('f-htot'))el('f-htot').value=tot;
+  calcValor();
+}
+function calcValor(){
+  const tot=parseFloat(el('f-htot')?.value||0);
+  const vh=parseFloat(el('f-vh')?.value||0);
+  if(el('f-vt'))el('f-vt').value=(tot*vh).toFixed(2);
+}
+function setVH(v){if(el('f-vh')){el('f-vh').value=v;calcValor();}}
+
+function buscaProdCPF(cpf){
+  const prod=gl('prod').find(p=>p.cpf===cpf.replace(/\D/g,''));
+  if(prod){
+    if(el('f-nome'))el('f-nome').value=prod.nome;
+    if(el('f-wa'))el('f-wa').value=prod.wa||'';
+  }
+}
+function getProdImoveis(cpf){
+  const prod=gl('prod').find(p=>p.cpf===(cpf||'').replace(/\D/g,''));
+  return prod?.imoveis||[];
+}
+
+function buildIB(key,label,orient){
+  const box=document.createElement('div');box.className='imgbox'+(opImgs[key]?' ok':'');box.id='ib-'+key;
+  const hd=document.createElement('div');hd.className='ib-hd';
+  const tk=document.createElement('span');tk.className='tick '+(opImgs[key]?'y':'n');tk.id='tk-'+key;tk.textContent=opImgs[key]?'✔':'○';
+  const lb=document.createElement('span');lb.className='ib-lbl';lb.textContent=label;
+  const rm=document.createElement('button');rm.className='ib-rm';rm.textContent='✕';rm.style.display=opImgs[key]?'flex':'none';rm.onclick=()=>rmImg(key);
+  hd.appendChild(tk);hd.appendChild(lb);hd.appendChild(rm);box.appendChild(hd);
+  const drop=document.createElement('div');drop.className='ib-drop';drop.id='dr-'+key;drop.style.display=opImgs[key]?'none':'flex';
+  drop.innerHTML=`<span style="font-size:22px">📷</span><span style="font-size:11px;font-weight:600;color:#1a3c5e">Foto / Galeria</span><span style="font-size:10px;color:#94a3b8">${orient==='portrait'?'Retrato':'Paisagem'}</span>`;
+  drop.onclick=()=>el('fi-'+key).click();
+  const prev=document.createElement('div');prev.className='ib-prev '+orient;prev.id='pv-'+key;prev.style.display=opImgs[key]?'block':'none';
+  const img=document.createElement('img');img.className=orient;if(opImgs[key])img.src=opImgs[key];
+  const ov=document.createElement('div');ov.className='ib-ov';ov.textContent='🔄 Trocar';
+  prev.appendChild(img);prev.appendChild(ov);prev.onclick=()=>el('fi-'+key).click();
+  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.style.display='none';inp.id='fi-'+key;
+  inp.onchange=e=>handleImg(key,e,orient);
+  box.appendChild(drop);box.appendChild(prev);box.appendChild(inp);return box;
+}
+
+function handleImg(key,e,orient){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=ev=>{
+    opImgs[key]=ev.target.result;
+    el('ib-'+key)?.classList.add('ok');
+    const tk=el('tk-'+key);if(tk){tk.className='tick y';tk.textContent='✔';}
+    el('ib-'+key)?.querySelector('.ib-rm')&&(el('ib-'+key).querySelector('.ib-rm').style.display='flex');
+    const dr=el('dr-'+key);if(dr)dr.style.display='none';
+    const pv=el('pv-'+key);if(pv){pv.style.display='block';const i=pv.querySelector('img');if(i)i.src=ev.target.result;}
+    const ic=Object.values(opImgs).filter(Boolean).length;
+    const ctr=el('img-ctr');if(ctr){ctr.textContent=ic+'/5';ctr.style.color=ic===5?'#16a34a':'#f59e0b';}
+  };r.readAsDataURL(f);e.target.value='';
+}
+function rmImg(key){
+  opImgs[key]=null;
+  el('ib-'+key)?.classList.remove('ok');
+  const tk=el('tk-'+key);if(tk){tk.className='tick n';tk.textContent='○';}
+  el('ib-'+key)?.querySelector('.ib-rm')&&(el('ib-'+key).querySelector('.ib-rm').style.display='none');
+  const dr=el('dr-'+key);if(dr)dr.style.display='flex';
+  const pv=el('pv-'+key);if(pv)pv.style.display='none';
+  const ic=Object.values(opImgs).filter(Boolean).length;
+  const ctr=el('img-ctr');if(ctr){ctr.textContent=ic+'/5';ctr.style.color=ic===5?'#16a34a':'#f59e0b';}
+}
+
+function saveFields(){
+  if(opStep===0){opForm.cpfProdutor=el('f-cpf')?.value||'';opForm.nomeProdutor=el('f-nome')?.value||'';opForm.whatsapp=el('f-wa')?.value||'';opForm.imovel=el('f-imovel')?.value||'';}
+  if(opStep===1){opForm.dataOS=el('f-data')?.value||'';opForm.nOrdem=el('f-nos')?.value||'';opForm.horIni=el('f-hini')?.value||'';opForm.horFin=el('f-hfin')?.value||'';opForm.totalHoras=el('f-htot')?.value||'';opForm.valorHora=el('f-vh')?.value||'';opForm.valorTotal=el('f-vt')?.value||'';opForm.tipoServico=el('f-ts')?.value||'';opForm.hectares=el('f-ha')?.value||'';}
+  if(opStep===2){opForm.maquinario=el('f-maq')?.value||'';opForm.implemento=el('f-imp')?.value||'';opForm.operador=el('f-opr')?.value||'';}
+}
+function validate(){
+  if(opStep===0&&(!el('f-cpf')?.value.trim()||!el('f-nome')?.value.trim()))return'CPF e nome do produtor são obrigatórios.';
+  if(opStep===1&&(!el('f-nos')?.value.trim()||!el('f-ts')?.value||!el('f-ha')?.value))return'Nº OS, tipo de serviço e hectares são obrigatórios.';
+  if(opStep===2&&(!el('f-maq')?.value||!el('f-opr')?.value))return'Selecione maquinário e operador.';
+  return'';
+}
+function showErr(m){const e=el('op-err');if(e){e.textContent=m;e.style.display=m?'block':'none';}}
+function opNext(){const e=validate();if(e){showErr(e);return;}showErr('');saveFields();opStep++;renderStep();}
+function opBack(){saveFields();opStep--;renderStep();}
+
+async function opSend(){
+  const btn=el('send-btn');btn.textContent='⏳ Enviando...';btn.disabled=true;
+  try{
+    const imgs=await compressAll(opImgs);
+    const rec={...opForm,imagens:imgs,id:Date.now(),enviadoEm:new Date().toISOString()};
+    if(navigator.onLine){
+      // Online: envia direto
+      await gas('save',{record:rec});
+      opStep=4;renderStep();
+    } else {
+      // Offline: salva na fila local
+      if(navigator.serviceWorker?.controller){
+        navigator.serviceWorker.controller.postMessage({type:'SAVE_OFFLINE',record:rec});
+      } else {
+        // Fallback: localStorage
+        const fila=JSON.parse(localStorage.getItem('pm_fila')||'[]');
+        fila.push(rec);localStorage.setItem('pm_fila',JSON.stringify(fila));
+      }
+      opStep=4;renderStep();
+      showOfflineBanner('📦 Salvo offline! Será enviado quando voltar a internet.');
+    }
+  }catch(e){
+    // Erro de rede: salva offline
+    const imgs=await compressAll(opImgs);
+    const rec={...opForm,imagens:imgs,id:Date.now(),enviadoEm:new Date().toISOString()};
+    const fila=JSON.parse(localStorage.getItem('pm_fila')||'[]');
+    fila.push(rec);localStorage.setItem('pm_fila',JSON.stringify(fila));
+    opStep=4;renderStep();
+    showOfflineBanner('📦 Sem internet — salvo para envio posterior.');
+  }
+}
+
+// ═══════════════════════════════════════
+// OFFICE TABS
+// ═══════════════════════════════════════
+function swOffTab(i){
+  document.querySelectorAll('.tab-it').forEach((b,j)=>b.classList.toggle('on',i===j));
+  document.querySelectorAll('.tab-pane').forEach((p,j)=>p.classList.toggle('on',i===j));
+}
+
+// ═══════════════════════════════════════
+// RECORDS
+// ═══════════════════════════════════════
+async function loadRecs(){
+  el('o-list').innerHTML='<div class="ldg"><span class="spin">⚙️</span><p>Carregando...</p></div>';
+  try{
+    const d=await gas('list');allRecs=Array.isArray(d)?d:[];
+    try{const p=await gas('ping');if(p.url)sheetUrl=p.url;el('sheet-btn').style.display=sheetUrl?'block':'none';}catch{}
+    updKpis();filterRecs();
+  }catch(e){el('o-list').innerHTML=`<div class="empty">❌ ${e.message}</div>`;}
+}
+
+function updKpis(){
+  el('kpi-t').textContent=allRecs.length;
+  el('kpi-a').textContent=allRecs.reduce((a,r)=>a+parseFloat(r.hectares||0),0).toFixed(1)+' ha';
+  el('kpi-h').textContent=allRecs.reduce((a,r)=>a+parseFloat(r.totalHoras||0),0).toFixed(1)+'h';
+  const vt=allRecs.reduce((a,r)=>a+parseFloat(r.valorTotal||0),0);
+  el('kpi-v').textContent='R$ '+vt.toLocaleString('pt-BR',{minimumFractionDigits:2});
+}
+
+function filterRecs(){
+  const q=(el('o-search')?.value||'').toLowerCase();
+  const list=allRecs.filter(r=>(r.nomeProdutor||'').toLowerCase().includes(q)||(r.operador||r.nomeOperador||'').toLowerCase().includes(q)||(r.nOrdem||'').includes(q)||(r.tipoServico||'').toLowerCase().includes(q)||(r.cpfProdutor||'').includes(q));
+  if(!list.length){el('o-list').innerHTML='<div class="empty">📋 Nenhum registro encontrado.</div>';return;}
+  el('o-list').innerHTML='<div class="card-list">'+list.map(r=>{
+    const ic=r.imgCount||0;
+    const fc=ic===5?'tag-foto':ic>0?'tag-foto-p':'tag-foto-n';
+    const op=r.operador||r.nomeOperador||'—';
+    const vt=r.valorTotal?fmtR(r.valorTotal):'—';
+    return`<div class="os-card">
+      <div class="os-top">
+        <span class="os-badge">OS #${r.nOrdem||'---'}</span>
+        <div class="os-main">
+          <div class="os-name">${r.nomeProdutor||'—'}</div>
+          <div class="os-meta">${fmt(r.dataOS||r.dataExecucao)} · ${op}${r.imovel?' · '+r.imovel:''}</div>
+        </div>
+      </div>
+      <div class="os-bot">
+        <span class="tag tag-serv">${r.tipoServico||'—'}</span>
+        ${r.hectares?`<span class="tag" style="background:#f3e8ff;color:#6b21a8">${r.hectares} ha</span>`:''}
+        <span class="tag tag-val">${vt}</span>
+        <span class="tag ${fc}">📷 ${ic}/5</span>
+        <div class="os-btns">
+          <button class="ic-btn prnt" onclick="openRec('${r.id}')" title="Imprimir">🖨️</button>
+          <button class="ic-btn edit" onclick="openEdit('${r.id}')" title="Editar">✏️</button>
+          <button class="ic-btn del" onclick="openDel('${r.id}')" title="Excluir">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+// ═══════════════════════════════════════
+// PRINT
+// ═══════════════════════════════════════
+async function openRec(id){
+  el('o-list').innerHTML='<div class="ldg"><span class="spin">⚙️</span><p>Carregando fotos...</p></div>';
+  try{const d=await gas('get',{id});renderPrint(d);showScreen('print');}
+  catch(e){filterRecs();alert('Erro: '+e.message);}
+}
+function closePrint(){showScreen('office');filterRecs();}
+
+function renderPrint(d){
+  const imgs=d.imagens||{};
+  // helper: image or placeholder
+  const ic=(k,cls)=>{
+    const src=imgs[k];
+    return src?`<img src="${src}" style="width:100%;height:100%;display:block;object-fit:${cls==='port'?'contain':'cover'};background:#fff;"/>`
+              :`<div class="pt-noimg ${cls}">SEM IMAGEM</div>`;
+  };
+  const chk=k=>imgs[k]?'☑':'☐';
+  const vt=(d.valorTotal&&parseFloat(d.valorTotal)>0)
+    ?fmtR(d.valorTotal)
+    :(d.totalHoras&&d.valorHora?fmtR(parseFloat(d.totalHoras)*parseFloat(d.valorHora)):'___');
+
+  el('pt-lbl').textContent=`OS Nº ${d.nOrdem||'---'} · ${d.nomeProdutor||'---'} · ${fmt(d.dataOS||d.dataExecucao||'')}`;
+
+  el('print-doc').innerHTML=`
+  <div class="pd-center">
+    <div class="pd-title">RELATÓRIO DE SERVIÇO – PATRULHA MECANIZADA</div>
+    <div class="pd-sub">SECRETARIA MUNICIPAL DE AGRICULTURA E MEIO AMBIENTE / SMAM – TABAPORÃ/MT</div>
+    <div class="pd-muni">Prefeitura Municipal de Tabaporã – Estado de Mato Grosso</div>
+  </div>
+  <table class="ptb"><tbody>
+    <tr><td colspan="4" class="pt-hd">1. IDENTIFICAÇÃO DO PRODUTOR</td></tr>
+    <tr><td class="pt-lbl2" style="width:15%">CPF:</td><td style="width:35%">${d.cpfProdutor||d.cpfCnpj||'___'}</td><td class="pt-lbl2" style="width:15%">WhatsApp:</td><td style="width:35%">${d.whatsapp||'___'}</td></tr>
+    <tr><td class="pt-lbl2">Nome:</td><td colspan="3">${d.nomeProdutor||'___'}</td></tr>
+    <tr><td class="pt-lbl2">Imóvel:</td><td colspan="3">${d.imovel||d.nomePropriedade||'___'}</td></tr>
+  </tbody></table>
+  <table class="ptb"><tbody>
+    <tr><td colspan="4" class="pt-hd">2. DADOS DA ORDEM DE SERVIÇO</td></tr>
+    <tr><td class="pt-lbl2" style="width:20%">Nº OS:</td><td style="width:30%">${d.nOrdem||'___'}</td><td class="pt-lbl2" style="width:20%">Data:</td><td style="width:30%">${fmt(d.dataOS||d.dataExecucao||'')}</td></tr>
+    <tr><td class="pt-lbl2">Horímetro Inicial:</td><td>${d.horIni||'___'}</td><td class="pt-lbl2">Horímetro Final:</td><td>${d.horFin||'___'}</td></tr>
+    <tr><td class="pt-lbl2">Total de Horas:</td><td>${d.totalHoras||d.horasTrabalhadas||'___'}</td><td class="pt-lbl2">Valor da Hora:</td><td>${d.valorHora?'R$ '+parseFloat(d.valorHora).toFixed(2):'___'}</td></tr>
+    <tr><td class="pt-lbl2">Tipo de Serviço:</td><td>${d.tipoServico||'___'}</td><td class="pt-lbl2" style="font-weight:bold">Valor Total:</td><td style="font-weight:bold;color:#0f5c2e">${vt}</td></tr>
+    <tr><td class="pt-lbl2">Hectares Executados:</td><td colspan="3">${d.hectares||d.areaExecutada||'___'} ha</td></tr>
+  </tbody></table>
+  <table class="ptb"><tbody>
+    <tr><td colspan="4" class="pt-hd">3. DADOS DO OPERADOR / MAQUINÁRIO</td></tr>
+    <tr><td class="pt-lbl2" style="width:20%">Maquinário:</td><td style="width:30%">${d.maquinario||'___'}</td><td class="pt-lbl2" style="width:20%">Implemento:</td><td style="width:30%">${d.implemento||'___'}</td></tr>
+    <tr><td class="pt-lbl2">Operador:</td><td colspan="3">${d.operador||d.nomeOperador||'___'}</td></tr>
+  </tbody></table>
+  <table class="ptb"><tbody>
+    <tr><td colspan="2" class="pt-hd">4. DOCUMENTOS ANEXOS</td></tr>
+    <tr><td style="width:50%;text-align:center;font-weight:bold;font-size:9px;padding:4px">${chk('requerimento')} REQUERIMENTO DO PRODUTOR</td>
+        <td style="width:50%;text-align:center;font-weight:bold;font-size:9px;padding:4px">${chk('ordemServico')} ORDEM DE SERVIÇO</td></tr>
+    <tr><td style="height:190px;padding:3px">${ic('requerimento','port')}</td>
+        <td style="height:190px;padding:3px">${ic('ordemServico','port')}</td></tr>
+  </tbody></table>
+  <table class="ptb"><tbody>
+    <tr><td colspan="3" class="pt-hd">5. REGISTRO FOTOGRÁFICO DA ÁREA</td></tr>
+    <tr><td style="width:33%;text-align:center;font-weight:bold;font-size:9px;padding:4px">${chk('areaAntes')} ÁREA ANTES</td>
+        <td style="width:33%;text-align:center;font-weight:bold;font-size:9px;padding:4px">${chk('areaDepois')} ÁREA DEPOIS</td>
+        <td style="width:33%;text-align:center;font-weight:bold;font-size:9px;padding:4px">${chk('areaDemarcacao')} ÁREA DEMARCADA</td></tr>
+    <tr><td style="height:130px;padding:3px">${ic('areaAntes','land')}</td>
+        <td style="height:130px;padding:3px">${ic('areaDepois','land')}</td>
+        <td style="height:130px;padding:3px">${ic('areaDemarcacao','land')}</td></tr>
+  </tbody></table>
+  <table class="ptb"><tbody>
+    <tr>
+      <td style="width:55%;vertical-align:top;padding:8px">
+        <div style="font-weight:bold;font-size:9px;margin-bottom:5px">6. DECLARAÇÃO</div>
+        <div style="font-size:9px;line-height:1.6">Declaro que os serviços acima descritos foram executados conforme solicitado, estando as informações registradas compatíveis com a execução realizada em campo.</div>
+      </td>
+      <td style="width:45%;vertical-align:top;padding:8px">
+        <div style="font-weight:bold;font-size:9px;margin-bottom:5px">7. ASSINATURAS</div>
+        <div style="border-bottom:1px solid #000;height:36px;margin-bottom:3px"></div>
+        <div style="font-size:8px;text-align:center">Operador: ${d.operador||d.nomeOperador||'_________________'}</div>
+        <div style="border-bottom:1px solid #000;height:36px;margin-bottom:3px;margin-top:12px"></div>
+        <div style="font-size:8px;text-align:center">Servidor Responsável / SMAM</div>
+      </td>
+    </tr>
+  </tbody></table>
+  <div class="pd-footer">Gerado em: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')} | OS Nº ${d.nOrdem||'---'} | Patrulha Mecanizada – SMAM Tabaporã/MT</div>`;
+}
+// Print all
+async function printAll(){
+  el('o-list').innerHTML='<div class="ldg"><span class="spin">⚙️</span><p>Aguarde...</p></div>';
+  try{
+    const list=allRecs.slice();
+    let html='';
+    for(const r of list){
+      const d=await gas('get',{id:r.id});
+      const imgs=d.imagens||{};
+      const ic=(k,cls)=>imgs[k]?`<img src="${imgs[k]}" class="${cls}"/>`:`<div class="pt-noimg ${cls}">Sem imagem</div>`;
+      const chk=k=>imgs[k]?'☑':'☐';
+      const vt=(d.valorTotal&&parseFloat(d.valorTotal)>0)?fmtR(d.valorTotal):(d.totalHoras&&d.valorHora?fmtR(parseFloat(d.totalHoras)*parseFloat(d.valorHora)):'___');
+      html+=`<div style="page-break-after:always">
+      <div class="pd-center">
+        <div class="pd-title">RELATÓRIO DE SERVIÇO – PATRULHA MECANIZADA</div>
+        <div class="pd-sub">SECRETARIA MUNICIPAL DE AGRICULTURA E MEIO AMBIENTE / SMAM – TABAPORÃ/MT</div>
+        <div class="pd-muni">Prefeitura Municipal de Tabaporã – Estado de Mato Grosso</div>
+      </div>
+      <table class="ptb"><tbody>
+        <tr><td colspan="4" class="pt-hd">1. IDENTIFICAÇÃO DO PRODUTOR</td></tr>
+        <tr><td class="pt-lbl2">CPF:</td><td>${d.cpfProdutor||'___'}</td><td class="pt-lbl2">WhatsApp:</td><td>${d.whatsapp||'___'}</td></tr>
+        <tr><td class="pt-lbl2">Nome:</td><td colspan="3">${d.nomeProdutor||'___'}</td></tr>
+        <tr><td class="pt-lbl2">Imóvel:</td><td colspan="3">${d.imovel||'___'}</td></tr>
+      </tbody></table>
+      <table class="ptb"><tbody>
+        <tr><td colspan="4" class="pt-hd">2. DADOS DA ORDEM DE SERVIÇO</td></tr>
+        <tr><td class="pt-lbl2">Nº OS:</td><td>${d.nOrdem||'___'}</td><td class="pt-lbl2">Data:</td><td>${fmt(d.dataOS||d.dataExecucao)}</td></tr>
+        <tr><td class="pt-lbl2">Horímetro Inicial:</td><td>${d.horIni||'___'}</td><td class="pt-lbl2">Horímetro Final:</td><td>${d.horFin||'___'}</td></tr>
+        <tr><td class="pt-lbl2">Total Horas:</td><td>${d.totalHoras||'___'}</td><td class="pt-lbl2">Valor Hora:</td><td>${d.valorHora?'R$ '+parseFloat(d.valorHora).toFixed(2):'___'}</td></tr>
+        <tr><td class="pt-lbl2">Tipo de Serviço:</td><td>${d.tipoServico||'___'}</td><td class="pt-lbl2">Valor Total:</td><td style="font-weight:bold">${vt}</td></tr>
+        <tr><td class="pt-lbl2">Hectares:</td><td>${d.hectares||'___'} ha</td><td class="pt-lbl2">Maquinário:</td><td>${d.maquinario||'___'}</td></tr>
+        <tr><td class="pt-lbl2">Operador:</td><td colspan="3">${d.operador||'___'}</td></tr>
+      </tbody></table>
+      <table class="ptb"><tbody>
+        <tr><td colspan="2" class="pt-hd">DOCUMENTOS</td></tr>
+        <tr><td style="width:50%" class="pt-chk">${chk('requerimento')} REQUERIMENTO</td><td style="width:50%" class="pt-chk">${chk('ordemServico')} ORDEM DE SERVIÇO</td></tr>
+        <tr><td class="pt-ic" style="height:140px">${ic('requerimento','port')}</td><td class="pt-ic" style="height:140px">${ic('ordemServico','port')}</td></tr>
+        <tr><td class="pt-chk">${chk('areaAntes')} ANTES</td><td class="pt-chk">${chk('areaDepois')} DEPOIS</td></tr>
+        <tr><td class="pt-ic" style="height:100px">${ic('areaAntes','land')}</td><td class="pt-ic" style="height:100px">${ic('areaDepois','land')}</td></tr>
+      </tbody></table></div>`;
+    }
+    el('pt-lbl').textContent=`Todos os serviços – ${allRecs.length} registros`;
+    el('print-doc').innerHTML=html;
+    showScreen('print');
+  }catch(e){filterRecs();alert('Erro: '+e.message);}
+}
+
+// ═══════════════════════════════════════
+// EDIT
+// ═══════════════════════════════════════
+async function openEdit(id){
+  try{
+    el('o-list').innerHTML='<div class="ldg"><span class="spin">⚙️</span><p>Carregando...</p></div>';
+    const d=await gas('get',{id});
+    editRec={...d, imagens:d.imagens||{}};
+    filterRecs();
+
+    const f=el('edit-form');f.innerHTML='';
+
+    // ── CAMPOS DE TEXTO ──
+    const flds=[
+      {l:'Nº OS',k:'nOrdem',t:'text'},
+      {l:'Data',k:'dataOS',t:'date'},
+      {l:'CPF Produtor',k:'cpfProdutor',t:'text'},
+      {l:'Nome Produtor',k:'nomeProdutor',t:'text'},
+      {l:'WhatsApp',k:'whatsapp',t:'text'},
+      {l:'Imóvel / Propriedade',k:'imovel',t:'text'},
+      {l:'Horímetro Inicial',k:'horIni',t:'number'},
+      {l:'Horímetro Final',k:'horFin',t:'number'},
+      {l:'Total de Horas',k:'totalHoras',t:'number'},
+      {l:'Valor da Hora (R$)',k:'valorHora',t:'number'},
+      {l:'Valor Total (R$)',k:'valorTotal',t:'number'},
+      {l:'Tipo de Serviço',k:'tipoServico',t:'text'},
+      {l:'Hectares Executados',k:'hectares',t:'number'},
+      {l:'Maquinário',k:'maquinario',t:'text'},
+      {l:'Implemento',k:'implemento',t:'text'},
+      {l:'Operador',k:'operador',t:'text'},
+    ];
+    // Compat campos antigos
+    if(!d.cpfProdutor&&d.cpfCnpj) editRec.cpfProdutor=d.cpfCnpj;
+    if(!d.imovel&&d.nomePropriedade) editRec.imovel=d.nomePropriedade;
+    if(!d.operador&&d.nomeOperador) editRec.operador=d.nomeOperador;
+    if(!d.totalHoras&&d.horasTrabalhadas) editRec.totalHoras=d.horasTrabalhadas;
+    if(!d.hectares&&d.areaExecutada) editRec.hectares=d.areaExecutada;
+    if(!d.dataOS&&d.dataExecucao) editRec.dataOS=d.dataExecucao;
+
+    flds.forEach(({l,k,t})=>{
+      const w=document.createElement('div');w.className='field';
+      const lb=document.createElement('label');lb.textContent=l;
+      const inp=document.createElement('input');
+      inp.type=t;inp.value=editRec[k]||'';
+      inp.style.cssText='border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 12px;font-size:13px;width:100%;outline:none;';
+      inp.oninput=()=>{editRec[k]=inp.value;};
+      w.appendChild(lb);w.appendChild(inp);f.appendChild(w);
+    });
+
+    // ── SEÇÃO DE ANEXOS E FOTOS ──
+    const divider=document.createElement('div');
+    divider.style.cssText='margin:16px 0 10px;padding:8px 12px;background:#1a3c5e;color:#fff;border-radius:8px;font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;';
+    divider.textContent='📎 ANEXOS E FOTOS — Toque para substituir';
+    f.appendChild(divider);
+
+    const imgKeys=[
+      {k:'requerimento',   l:'REQUERIMENTO DO PRODUTOR',  orient:'port'},
+      {k:'ordemServico',   l:'ORDEM DE SERVIÇO',           orient:'port'},
+      {k:'areaAntes',      l:'ÁREA ANTES',                 orient:'land'},
+      {k:'areaDepois',     l:'ÁREA DEPOIS',                orient:'land'},
+      {k:'areaDemarcacao', l:'ÁREA DEMARCADA',             orient:'land'},
+    ];
+
+    const imgGrid=document.createElement('div');
+    imgGrid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;';
+
+    imgKeys.forEach(({k,l,orient})=>{
+      const box=document.createElement('div');
+      box.style.cssText='border:2px solid #e2e8f0;border-radius:10px;overflow:hidden;background:#f8fafc;';
+      box.id='editbox-'+k;
+
+      // Header
+      const hd=document.createElement('div');
+      hd.style.cssText='font-size:9px;font-weight:700;text-transform:uppercase;color:#fff;padding:5px 8px;background:'+(editRec.imagens[k]?'#16a34a':'#94a3b8')+';display:flex;align-items:center;gap:4px;';
+      hd.id='edithd-'+k;
+      hd.innerHTML=(editRec.imagens[k]?'<span>☑</span>':'<span>☐</span>')+' <span>'+l+'</span>';
+      box.appendChild(hd);
+
+      // Image or placeholder
+      const imgWrap=document.createElement('div');
+      imgWrap.style.cssText='position:relative;cursor:pointer;';
+
+      if(editRec.imagens[k]){
+        const img=document.createElement('img');
+        img.src=editRec.imagens[k];
+        img.id='editimg-'+k;
+        img.style.cssText='width:100%;height:'+(orient==='port'?'120px':'85px')+';object-fit:'+(orient==='port'?'contain':'cover')+';background:#fff;display:block;';
+        imgWrap.appendChild(img);
+        const ov=document.createElement('div');
+        ov.style.cssText='position:absolute;inset:0;background:rgba(0,0,0,0);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;transition:background .2s;';
+        ov.textContent='🔄 Trocar';
+        imgWrap.onmouseenter=()=>ov.style.background='rgba(0,0,0,.45)';
+        imgWrap.onmouseleave=()=>ov.style.background='rgba(0,0,0,0)';
+        imgWrap.appendChild(ov);
+      } else {
+        const noimg=document.createElement('div');
+        noimg.style.cssText='height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#94a3b8;font-size:11px;';
+        noimg.innerHTML='<span style="font-size:22px">📷</span><span>Sem imagem</span><span style="font-size:9px">Toque para adicionar</span>';
+        imgWrap.appendChild(noimg);
+      }
+
+      // File input
+      const inp=document.createElement('input');
+      inp.type='file';inp.accept='image/*';inp.style.display='none';inp.id='editfi-'+k;
+      inp.onchange=async(e)=>{
+        const file=e.target.files[0];if(!file)return;
+        const reader=new FileReader();
+        reader.onload=async(ev)=>{
+          // Compress
+          const compressed=await compress(ev.target.result,800,0.70);
+          editRec.imagens[k]=compressed;
+          // Update UI
+          box.style.borderColor='#16a34a';
+          const hd2=el('edithd-'+k);
+          if(hd2){hd2.style.background='#16a34a';hd2.innerHTML='<span>☑</span> <span>'+l+'</span>';}
+          const existImg=el('editimg-'+k);
+          if(existImg){existImg.src=compressed;}
+          else{
+            imgWrap.innerHTML='';
+            const ni=document.createElement('img');ni.id='editimg-'+k;
+            ni.src=compressed;
+            ni.style.cssText='width:100%;height:'+(orient==='port'?'120px':'85px')+';object-fit:'+(orient==='port'?'contain':'cover')+';background:#fff;display:block;';
+            imgWrap.appendChild(ni);
+          }
+        };
+        reader.readAsDataURL(file);
+        e.target.value='';
+      };
+
+      imgWrap.onclick=()=>inp.click();
+      box.appendChild(imgWrap);
+      box.appendChild(inp);
+
+      // Remove button
+      if(editRec.imagens[k]){
+        const rmBtn=document.createElement('button');
+        rmBtn.textContent='✕ Remover imagem';
+        rmBtn.style.cssText='width:100%;background:#fee2e2;border:none;color:#dc2626;font-size:10px;padding:4px;cursor:pointer;font-weight:600;';
+        rmBtn.onclick=(e)=>{
+          e.stopPropagation();
+          editRec.imagens[k]=null;
+          box.style.borderColor='#e2e8f0';
+          const hd3=el('edithd-'+k);
+          if(hd3){hd3.style.background='#94a3b8';hd3.innerHTML='<span>☐</span> <span>'+l+'</span>';}
+          imgWrap.innerHTML='<div style="height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#94a3b8;font-size:11px;"><span style=\'font-size:22px\'>📷</span><span>Sem imagem</span><span style=\'font-size:9px\'>Toque para adicionar</span></div>';
+          rmBtn.remove();
+          imgWrap.onclick=()=>inp.click();
+        };
+        box.appendChild(rmBtn);
+      }
+
+      imgGrid.appendChild(box);
+    });
+    f.appendChild(imgGrid);
+
+    el('edit-modal').classList.add('open');
+  }catch(e){alert('Erro ao carregar: '+e.message);}
+}
+function closeEditModal(){el('edit-modal').classList.remove('open');editRec=null;}
+async function saveEdit(){
+  if(!editRec)return;
+  const btn=el('edit-modal').querySelector('.btn-primary');
+  if(btn){btn.textContent='⏳ Salvando...';btn.disabled=true;}
+  try{
+    // Salva sem imagens primeiro (mais rápido, evita timeout)
+    const recSemImagem={...editRec};
+    delete recSemImagem.imagens;
+    // Mantém imagens que já estavam em editRec se existirem
+    const recFinal={...recSemImagem, imagens: editRec.imagens||{}};
+    await gas('save',{record:recFinal});
+    closeEditModal();
+    loadRecs();
+  }catch(e){
+    alert('Erro ao salvar: '+e.message);
+    if(btn){btn.textContent='💾 Salvar Alterações';btn.disabled=false;}
+  }
+}
+
+// ═══════════════════════════════════════
+// DELETE
+// ═══════════════════════════════════════
+function openDel(id){pendingDel=id;el('del-modal').classList.add('open');}
+function closeDel(){pendingDel=null;el('del-modal').classList.remove('open');}
+async function doDel(){
+  if(!pendingDel)return;
+  try{await gas('delete',{id:pendingDel});}catch(e){alert('Erro: '+e.message);}
+  closeDel();loadRecs();
+}
+
+// ═══════════════════════════════════════
+// CADASTROS
+// ═══════════════════════════════════════
+function renderCads(){
+  ['maq','imp','op','ts'].forEach(k=>{
+    const list=gl(k);
+    const ul=el(k+'-list');if(!ul)return;
+    ul.innerHTML='';
+    list.forEach((v,i)=>{
+      const row=document.createElement('div');row.className='item-row';
+      const sp=document.createElement('span');sp.textContent=v;
+      const rm=document.createElement('button');rm.className='item-rm';rm.textContent='✕';
+      rm.onclick=()=>{const l=gl(k);l.splice(i,1);sl(k,l);renderCads();};
+      row.appendChild(sp);row.appendChild(rm);ul.appendChild(row);
+    });
+    const cnt=el(k+'-count');if(cnt)cnt.textContent=list.length+' itens';
+  });
+}
+function addItem(k){
+  const inp=el(k+'-inp');if(!inp)return;
+  const v=inp.value.trim().toUpperCase();if(!v)return;
+  const l=gl(k);if(l.includes(v)){alert('Item já existe!');return;}
+  l.push(v);sl(k,l);inp.value='';renderCads();
+}
+
+// ═══════════════════════════════════════
+// PRODUTORES
+// ═══════════════════════════════════════
+function openProdModal(idx){
+  editProdIdx=idx??null;pmImoveis=[];
+  el('prod-modal-title').textContent=idx!=null?'✏️ Editar Produtor':'👤 Cadastrar Produtor';
+  if(idx!=null){
+    const p=gl('prod')[idx];
+    el('pm-cpf').value=p.cpf;el('pm-nome').value=p.nome;el('pm-wa').value=p.wa||'';
+    pmImoveis=[...(p.imoveis||[])];
+  }else{el('pm-cpf').value='';el('pm-nome').value='';el('pm-wa').value='';pmImoveis=[];}
+  renderPmImoveis();el('prod-modal').classList.add('open');
+}
+function closeProdModal(){el('prod-modal').classList.remove('open');}
+function renderPmImoveis(){
+  const ul=el('pm-imoveis-list');ul.innerHTML='';
+  pmImoveis.forEach((im,i)=>{
+    const row=document.createElement('div');row.className='imovel-row';
+    const sp=document.createElement('span');sp.textContent=im.nome+' – '+im.end;
+    const rm=document.createElement('button');rm.className='item-rm';rm.textContent='✕';rm.onclick=()=>{pmImoveis.splice(i,1);renderPmImoveis();};
+    row.appendChild(sp);row.appendChild(rm);ul.appendChild(row);
+  });
+}
+function addImovel(){
+  const n=el('pm-im-nome').value.trim();const e=el('pm-im-end').value.trim();
+  if(!n)return;pmImoveis.push({nome:n,end:e});el('pm-im-nome').value='';el('pm-im-end').value='';renderPmImoveis();
+}
+function saveProd(){
+  const cpf=el('pm-cpf').value.replace(/\D/g,'');const nome=el('pm-nome').value.trim();
+  if(!cpf||!nome){alert('CPF e nome são obrigatórios.');return;}
+  const l=gl('prod');
+  const obj={cpf,nome,wa:el('pm-wa').value,imoveis:pmImoveis};
+  if(editProdIdx!=null)l[editProdIdx]=obj;else l.push(obj);
+  sl('prod',l);closeProdModal();renderProdList();
+}
+function renderProdList(){
+  const q=(el('prod-search')?.value||'').toLowerCase();
+  const list=gl('prod').filter(p=>p.nome.toLowerCase().includes(q)||p.cpf.includes(q));
+  const ul=el('prod-list');if(!ul)return;
+  if(!list.length){ul.innerHTML='<div class="empty">Nenhum produtor cadastrado.</div>';return;}
+  ul.innerHTML='';
+  list.forEach((p,i)=>{
+    const realIdx=gl('prod').findIndex(x=>x.cpf===p.cpf);
+    const card=document.createElement('div');card.className='prod-card';
+    card.innerHTML=`<div class="prod-top">
+      <div class="prod-ico">👤</div>
+      <div class="prod-main">
+        <div class="prod-name">${p.nome}</div>
+        <div class="prod-meta">CPF: ${p.cpf}${p.wa?' · 📱 '+p.wa:''}</div>
+      </div>
+      <div class="prod-btns">
+        <button class="ic-btn edit" onclick="openProdModal(${realIdx})">✏️</button>
+        <button class="ic-btn del" onclick="delProd(${realIdx})">🗑</button>
+      </div>
+    </div>`;
+    if(p.imoveis?.length){
+      const im=document.createElement('div');im.className='prod-imoveis';
+      p.imoveis.forEach(v=>{
+        const r=document.createElement('div');r.className='imovel-row';
+        r.innerHTML=`<span>🏡 <strong>${v.nome}</strong>${v.end?' – '+v.end:''}</span>`;im.appendChild(r);
+      });
+      card.appendChild(im);
+    }
+    ul.appendChild(card);
+  });
+}
+function filterProd(){renderProdList();}
+function delProd(i){if(!confirm('Excluir produtor?'))return;const l=gl('prod');l.splice(i,1);sl('prod',l);renderProdList();}
+
+// ═══════════════════════════════════════
+// VALORES
+// ═══════════════════════════════════════
+function renderVals(){
+  const l=gl('val');const ul=el('val-list');if(!ul)return;ul.innerHTML='';
+  l.forEach((v,i)=>{
+    const row=document.createElement('div');row.className='item-row';
+    row.innerHTML=`<span><strong>${v.maq}</strong> – R$ ${parseFloat(v.preco).toFixed(2)}/${v.tipo}</span>`;
+    const rm=document.createElement('button');rm.className='item-rm';rm.textContent='✕';
+    rm.onclick=()=>{const l2=gl('val');l2.splice(i,1);sl('val',l2);renderVals();};
+    row.appendChild(rm);ul.appendChild(row);
+  });
+  const da=el('val-data-atu');if(da)da.textContent=gl('valData')||'30/06/2025';
+}
+function addValor(){
+  const m=el('val-maq-inp').value.trim().toUpperCase();
+  const p=parseFloat(el('val-preco-inp').value);
+  const t=el('val-tipo-inp').value;
+  if(!m||!p)return;
+  const l=gl('val');l.push({maq:m,preco:p,tipo:t});sl('val',l);
+  el('val-maq-inp').value='';el('val-preco-inp').value='';renderVals();
+}
+function updDataAtu(){
+  const d=prompt('Nova data de atualização:',gl('valData')||'30/06/2025');
+  if(d){sl('valData',d);renderVals();}
+}
+</script>
+
+<script>
+// ═══════════════════════════════════════
+// SERVICE WORKER — OFFLINE + SYNC
+// ═══════════════════════════════════════
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    console.log('SW registrado:', reg.scope);
+  }).catch(e=>console.log('SW erro:',e));
+}
+
+// ═══ OFFLINE QUEUE ═══════════════════════════════════════════
+let swReady = false;
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.ready.then(()=>{ swReady=true; });
+  navigator.serviceWorker.addEventListener('message', e=>{
+    if(e.data.type==='SAVED_OFFLINE') showOfflineBanner('📦 Salvo offline! Será enviado quando voltar a internet.');
+    if(e.data.type==='SYNCED'){ showOfflineBanner('✅ Sincronizado com o servidor!'); loadRecs(); }
+  });
+}
+window.addEventListener('online', async ()=>{
+  hideOfflineBanner();
+  // Sincroniza fila do localStorage quando voltar internet
+  const fila = JSON.parse(localStorage.getItem('pm_fila')||'[]');
+  if(fila.length > 0){
+    showOfflineBanner('🔄 Sincronizando '+fila.length+' lançamento(s) pendente(s)...');
+    let ok=0;
+    for(const rec of fila){
+      try{
+        const r=await fetch(GAS_URL,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'save',record:rec})});
+        const j=await r.json();
+        if(j.ok) ok++;
+      }catch(e){ break; }
+    }
+    if(ok>0){
+      const restante=fila.slice(ok);
+      localStorage.setItem('pm_fila',JSON.stringify(restante));
+      showOfflineBanner('✅ '+ok+' lançamento(s) sincronizado(s) com sucesso!');
+      setTimeout(hideOfflineBanner,4000);
+    }
+  }
+});
+window.addEventListener('offline', ()=>{ showOfflineBanner('📵 Sem internet — lançamentos serão salvos localmente.'); });
+function showOfflineBanner(msg){
+  let b=document.getElementById('offline-banner');
+  if(!b){b=document.createElement('div');b.id='offline-banner';
+    b.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#f59e0b;color:#fff;padding:10px 16px;font-size:13px;font-weight:600;z-index:9999;text-align:center;';
+    document.body.appendChild(b);}
+  b.textContent=msg;b.style.display='block';
+  setTimeout(()=>{if(b)b.style.display='none';},5000);
+}
+function hideOfflineBanner(){ const b=document.getElementById('offline-banner');if(b)b.style.display='none'; }
+if(!navigator.onLine) showOfflineBanner('📵 Sem internet — lançamentos serão salvos localmente.');
+
+</script>
+
+</body>
+</html>
